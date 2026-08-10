@@ -1,0 +1,9 @@
+@EventTicketManagement_HostAddress = http://localhost:5295
+
+GET {{EventTicketManagement_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{EventTicketManagement_HostAddress}}/api/Test/ping-mongo
+Accept: application/json
