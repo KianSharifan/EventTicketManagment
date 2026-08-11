@@ -6,12 +6,12 @@ public class TicketType
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string Id { get; set; }  = null!;
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string EventId { get; set; }
+    public required string EventId { get; set; }
 
-    public string Name { get; set; }            // "VIP", "Normal"
+    public required string Name { get; set; }            // "VIP", "Normal"
     public decimal Price { get; set; }
     public int TotalCapacity { get; set; }
     public int SoldCount { get; set; }           // فعلاً تو Mongo، بعداً منبع حقیقتش با Redis هماهنگ میشه

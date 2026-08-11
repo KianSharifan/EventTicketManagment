@@ -6,15 +6,15 @@ public class Ticket
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string Id { get; set; }  = null!;
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string OrderId { get; set; }
+    public required string OrderId { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string TicketTypeId { get; set; }
+    public required string TicketTypeId { get; set; }
     
-    public string UniqueCode { get; set; }          // کد یکتا برای QR
+    public required string UniqueCode { get; set; }          // کد یکتا برای QR
     public bool CheckedIn { get; set; }
     public DateTime? CheckedInAt { get; set; }
 }

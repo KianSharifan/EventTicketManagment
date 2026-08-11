@@ -6,7 +6,7 @@ public class Event
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     public required string Title { get; set; }
     public string? Description { get; set; }

@@ -6,7 +6,7 @@ public class EventCategory
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Id { get; set; }
+    public string Id { get; set; } = null!;
 
     public required string Name { get; set; }   // "Concert", "Conference", "Workshop", ...
     public string? Description { get; set; }

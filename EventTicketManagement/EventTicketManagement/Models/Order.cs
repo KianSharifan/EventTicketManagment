@@ -6,7 +6,7 @@ public class Order
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Id { get; set; }
+    public string Id { get; set; }  = null!;
 
     [BsonRepresentation(BsonType.ObjectId)]
     public required string UserId { get; set; }
