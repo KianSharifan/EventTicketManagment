@@ -6,15 +6,15 @@ public class Order
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string UserId { get; set; }
+    public required string UserId { get; set; }
 
-    public List<OrderItem> Items { get; set; }   // embedded — چون همیشه با هم خونده میشن
+    public required List<OrderItem> Items { get; set; }   // embedded — چون همیشه با هم خونده میشن
 
     public decimal TotalAmount { get; set; }
-    public string Status { get; set; }            // "Pending" | "Confirmed" | "Failed"
+    public required string Status { get; set; }            // "Pending" | "Confirmed" | "Failed"
     public DateTime CreatedAt { get; set; }
 }
 
@@ -22,9 +22,9 @@ public class Order
 public class OrderItem
 {
     [BsonRepresentation(BsonType.ObjectId)]
-    public string TicketTypeId { get; set; }
+    public required string TicketTypeId { get; set; }
 
-    public string TicketTypeName { get; set; } 
+    public required string TicketTypeName { get; set; }
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
 }

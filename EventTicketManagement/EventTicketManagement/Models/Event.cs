@@ -6,15 +6,20 @@ public class Event
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public required string Title { get; set; }
+    public string? Description { get; set; }
     public DateTime EventDate { get; set; }
-    public string Location { get; set; }
 
     [BsonRepresentation(BsonType.ObjectId)]
-    public string OrganizerId { get; set; }
+    public required string OrganizerId { get; set; }
+    
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string EventCategoryId { get; set; }
+    
+    [BsonRepresentation(BsonType.ObjectId)]
+    public required string VenueId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

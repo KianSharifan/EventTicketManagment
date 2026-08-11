@@ -14,7 +14,10 @@ public class MongoIndexInitializer
         var ticketCodeIndexOptions = new CreateIndexOptions { Unique = true };
         await context.Tickets.Indexes.CreateOneAsync(new CreateIndexModel<Ticket>(ticketCodeIndexKeys, ticketCodeIndexOptions));
 
-        var eventDateIndexKeys = Builders<Event>.IndexKeys.Ascending(e => e.EventDate);
-        await context.Events.Indexes.CreateOneAsync(new CreateIndexModel<Event>(eventDateIndexKeys));
+        var eventTitleIndexKeys = Builders<Event>.IndexKeys.Ascending(e => e.Title);
+        await context.Events.Indexes.CreateOneAsync(new CreateIndexModel<Event>(eventTitleIndexKeys));
+        
+        var eventCategoryTitleIndexKeys = Builders<EventCategory>.IndexKeys.Ascending(e => e.Name);
+        await context.EventCategories.Indexes.CreateOneAsync(new CreateIndexModel<EventCategory>(eventCategoryTitleIndexKeys));
     }
 }

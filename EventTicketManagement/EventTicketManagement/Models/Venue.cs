@@ -6,10 +6,10 @@ public class Venue
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 
-    public string Name { get; set; }
-    public string Address { get; set; }
-    public string City { get; set; }
-    public int Capacity { get; set; }
+    public required string Name { get; set; }
+    public required string Address { get; set; }
+    public required string City { get; set; }
+    public required uint Capacity { get; set; }
 }
