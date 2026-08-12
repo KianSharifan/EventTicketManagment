@@ -13,6 +13,6 @@ public class TicketType
 
     public required string Name { get; set; }            // "VIP", "Normal"
     public decimal Price { get; set; }
-    public int TotalCapacity { get; set; }
-    public int SoldCount { get; set; }           // فعلاً تو Mongo، بعداً منبع حقیقتش با Redis هماهنگ میشه
+    public uint TotalCapacity { get; set; }
+    public uint SoldCount { get; set; }           // فعلاً تو Mongo، بعداً منبع حقیقتش با Redis هماهنگ میشه
 }
