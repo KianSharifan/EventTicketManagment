@@ -71,7 +71,7 @@ public class VenueController : ControllerBase
     {
         try
         {
-            if (!string.IsNullOrWhiteSpace(venueDto.Name) || !string.IsNullOrWhiteSpace(venueDto.Address) || venueDto.Capacity == null || !string.IsNullOrWhiteSpace(venueDto.City))
+            if (!string.IsNullOrWhiteSpace(venueDto.Name) && !string.IsNullOrWhiteSpace(venueDto.Address) && venueDto.Capacity != null && !string.IsNullOrWhiteSpace(venueDto.City))
             {
                 bool exists = await _context.Venues
                     .Find(x => x.Name == venueDto.Name)
