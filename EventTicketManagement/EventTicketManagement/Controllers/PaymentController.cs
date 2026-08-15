@@ -1,6 +1,5 @@
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
-using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -51,46 +50,7 @@ public class PaymentController : ControllerBase
             return StatusCode(500, "An unexpected error occured");
         }
     }
-
-    [HttpPost]
-    public async Task<IActionResult> CreatePayment([FromBody] PaymentDto paymentDto)
-    {
-        try
-        {
-            if (paymentDto.OrderId == null || paymentDto.Amount == null ||
-                paymentDto.Status == null)
-                return BadRequest("Invalid Inputs");
-
-            if (!ObjectId.TryParse(paymentDto.OrderId, out _))
-                return BadRequest("Invalid order ID format");
-
-            var order = await _context.Orders.Find(x => x.Id == paymentDto.OrderId).FirstOrDefaultAsync();
-            if (order == null)
-                return NotFound("No such order");
-
-            bool alreadyExists = await _context.Payments
-                .Find(x => x.OrderId == paymentDto.OrderId)
-                .AnyAsync();
-            if (alreadyExists)
-                return BadRequest("A payment for this order already exists");
-
-            var payment = new Payment
-            {
-                OrderId = paymentDto.OrderId,
-                Amount = paymentDto.Amount.Value,
-                Status = paymentDto.Status,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _context.Payments.InsertOneAsync(payment);
-            return CreatedAtAction(nameof(GetById), new { id = payment.Id }, payment);
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, "An unexpected error occured");
-        }
-    }
-
+    
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePayment(string id, [FromBody] PaymentDto paymentDto)
     {
@@ -102,9 +62,6 @@ public class PaymentController : ControllerBase
             var existingPayment = await _context.Payments.Find(x => x.Id == id).FirstOrDefaultAsync();
             if (existingPayment == null)
                 return NotFound("No such payment");
-
-            if (!string.IsNullOrWhiteSpace(paymentDto.Status))
-                existingPayment.Status = paymentDto.Status;
 
             if (paymentDto.Amount != null)
                 existingPayment.Amount = paymentDto.Amount.Value;
