@@ -7,3 +7,10 @@ Accept: application/json
 
 GET {{EventTicketManagement_HostAddress}}/api/Test/ping-mongo
 Accept: application/json
+
+###
+
+GET {{EventTicketManagement_HostAddress}}/api/Test
+Accept: application/json
+
+###

@@ -1,6 +1,8 @@
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
+using EventTicketManagement.Interfaces;
 using EventTicketManagement.Models;
+using EventTicketManagement.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -12,10 +14,14 @@ namespace EventTicketManagement.Controllers;
 public class TicketController : ControllerBase
 {
     private readonly MongoDbContext _context;
+    private readonly IOrderService _orderService;
+    private readonly ITicketPdfService _ticketPdfService;
 
-    public TicketController(MongoDbContext context)
+    public TicketController(MongoDbContext context, IOrderService orderService, ITicketPdfService ticketPdfService)
     {
         _context = context;
+        _orderService = orderService;
+        _ticketPdfService = ticketPdfService;
     }
     
     [HttpGet]
@@ -96,5 +102,31 @@ public class TicketController : ControllerBase
         {
             return StatusCode(500, "An unexpected error occured");
         }
+    }
+    
+    [HttpGet("orders/{orderId}/ticket-pdf")]
+    public async Task<IActionResult> DownloadTicketPdf(string orderId)
+    {
+        var order = await _orderService.GetByIdAsync(orderId);
+        if (order == null) 
+            return NotFound("No such order");
+
+        // چک کن این کاربر واقعاً صاحب این orderه (auth بعداً که اضافه شد)
+
+        var user = await _context.Users.Find(u => u.Id == order.UserId).FirstOrDefaultAsync();
+        var orderConfirmation = new OrderConfirmation
+        {
+            OrderId = orderId,
+            Email = user.Email,
+            Items = order.Items.Select(i => new OrderConfirmedItem
+            {
+                TicketTypeId = i.TicketTypeId,
+                TicketTypeName = i.TicketTypeName,
+                Quantity = (int)i.Quantity
+            }).ToList()
+        };
+        var pdfBytes = await _ticketPdfService.GenerateAsync(orderConfirmation);
+
+        return File(pdfBytes, "application/pdf", $"ticket-{orderId}.pdf");
     }
 }

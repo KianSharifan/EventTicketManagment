@@ -2,6 +2,7 @@ using EventTicketManagement.Data;
 using EventTicketManagement.Interfaces;
 using MongoDB.Driver;
 using StackExchange.Redis;
+using EventTicketManagement.Models;
 
 namespace EventTicketManagement.Services;
 
@@ -9,16 +10,19 @@ public class ReservationService : IReservationService
 {
     private readonly IDatabase _redis;
     private readonly MongoDbContext _context;
+    private readonly IOrderPublisher _orderPublisher;
 
     private static readonly TimeSpan ReservationDuration =
         TimeSpan.FromMinutes(10);
 
     public ReservationService(
+        IOrderPublisher orderPublisher,
         IConnectionMultiplexer redis,
         MongoDbContext context)
     {
         _redis = redis.GetDatabase();
         _context = context;
+        _orderPublisher = orderPublisher;
     }
 
     public async Task<bool> ReserveAsync(Models.Order order)
@@ -135,8 +139,22 @@ public class ReservationService : IReservationService
 
             await _context.TicketTypes.UpdateOneAsync(
                 x => x.Id == item.TicketTypeId,
-                Builders<Models.TicketType>.Update.Inc(x => (int)x.SoldCount, (int)item.Quantity)
+                Builders<TicketType>.Update.Inc(x => (int)x.SoldCount, (int)item.Quantity)
             );
         }
+        
+        var user = await _context.Users.Find( u => u.Id == order.UserId).FirstOrDefaultAsync();
+        
+        await _orderPublisher.PublishOrderConfirmedAsync(new OrderConfirmation
+        {
+            OrderId = order.Id,
+            Email = user.Email,
+            Items = order.Items.Select(i => new OrderConfirmedItem
+            {
+                TicketTypeId = i.TicketTypeId,
+                TicketTypeName = i.TicketTypeName,
+                Quantity = (int)i.Quantity
+            }).ToList()
+        });
     }
 }

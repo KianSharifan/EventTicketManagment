@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace EventTicketManagement.Services;
 
-public class OrderService
+public class OrderService : IOrderService
 {
     private readonly MongoDbContext _context;
     private readonly IReservationService _reservationService;
@@ -151,20 +151,7 @@ public class OrderService
             order
         );
 
-        foreach (var item in order.Items)
-        {
-            await _context.TicketTypes.UpdateOneAsync(
-                x => x.Id == item.TicketTypeId,
-
-                Builders<TicketType>.Update
-                    .Inc(x => x.SoldCount, item.Quantity)
-            );
-        }
-
-        await _reservationService
-            .ReleaseAsync(order);
-
-        // Send confirmation email
+        await _reservationService.ConfirmAsync(order);
 
         return (true, null, order); 
     }

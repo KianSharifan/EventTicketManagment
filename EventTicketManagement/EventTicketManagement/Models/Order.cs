@@ -11,7 +11,7 @@ public class Order
     [BsonRepresentation(BsonType.ObjectId)]
     public required string UserId { get; set; }
     
-    public required List<OrderItem> Items { get; set; }   // embedded — چون همیشه با هم خونده میشن
+    public required List<OrderItem> Items { get; set; }
     public decimal TotalAmount { get; set; }
     public required string Status { get; set; }   // "Pending" | "Confirmed" | "Failed"
     public DateTime CreatedAt { get; set; }

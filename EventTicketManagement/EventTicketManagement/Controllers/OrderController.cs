@@ -1,9 +1,9 @@
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
-using EventTicketManagement.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using EventTicketManagement.Interfaces;
 
 namespace EventTicketManagement.Controllers;
 
@@ -11,10 +11,10 @@ namespace EventTicketManagement.Controllers;
 [Route("api/[controller]")]
 public class OrderController : Controller
 {
-    private readonly OrderService _orderService;
+    private readonly IOrderService _orderService;
     private readonly MongoDbContext _context;
 
-    public OrderController(OrderService orderService, MongoDbContext context)
+    public OrderController(IOrderService orderService, MongoDbContext context)
     {
         _orderService = orderService;
         _context = context;
