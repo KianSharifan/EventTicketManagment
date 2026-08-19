@@ -3,14 +3,8 @@ using EventTicketManagement.Interfaces;
 using MongoDB.Driver;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 
 namespace EventTicketManagement.Services;
-
-public interface ITicketPdfService
-{
-    public Task<byte[]> GenerateAsync(Models.OrderConfirmation orderEvent);
-}
 
 public class TicketPdfService : ITicketPdfService
 {

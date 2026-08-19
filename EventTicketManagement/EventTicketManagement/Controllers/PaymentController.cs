@@ -1,5 +1,6 @@
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
+using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;

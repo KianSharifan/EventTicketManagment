@@ -29,7 +29,8 @@ public class TicketController : ControllerBase
     {
         try
         {
-            return Ok(await _context.TicketTypes.Find(_ => true).ToListAsync());
+            // return Ok(await _context.TicketTypes.Find(_ => true).ToListAsync());
+            return Ok(await _context.Tickets.Find(_ => true).ToListAsync());
         }
         catch (Exception)
         {
@@ -113,20 +114,8 @@ public class TicketController : ControllerBase
 
         // چک کن این کاربر واقعاً صاحب این orderه (auth بعداً که اضافه شد)
 
-        var user = await _context.Users.Find(u => u.Id == order.UserId).FirstOrDefaultAsync();
-        var orderConfirmation = new OrderConfirmation
-        {
-            OrderId = orderId,
-            Email = user.Email,
-            Items = order.Items.Select(i => new OrderConfirmedItem
-            {
-                TicketTypeId = i.TicketTypeId,
-                TicketTypeName = i.TicketTypeName,
-                Quantity = (int)i.Quantity
-            }).ToList()
-        };
-        var pdfBytes = await _ticketPdfService.GenerateAsync(orderConfirmation);
+        var content = await _context.TicketPdfs.Find(t => t.OrderId == orderId).FirstOrDefaultAsync();
 
-        return File(pdfBytes, "application/pdf", $"ticket-{orderId}.pdf");
+        return File(content!.Content, "application/pdf", $"ticket-{orderId}.pdf");
     }
 }

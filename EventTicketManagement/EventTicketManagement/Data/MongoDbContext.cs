@@ -37,4 +37,7 @@ public class MongoDbContext
     
     public IMongoCollection<Payment> Payments =>
         _database.GetCollection<Payment>("payments");
+    
+    public IMongoCollection<TicketPdf> TicketPdfs =>
+        _database.GetCollection<TicketPdf>("TicketPdfs");
 }

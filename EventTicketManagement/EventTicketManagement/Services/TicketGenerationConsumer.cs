@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using EventTicketManagement.Data;
 using EventTicketManagement.Interfaces;
 using EventTicketManagement.Models;
 using RabbitMQ.Client;
@@ -18,8 +19,10 @@ public class TicketGenerationConsumer : BackgroundService
 
     private IConnection? _connection;
     private IChannel? _channel;
+    private readonly MongoDbContext _context;
 
     public TicketGenerationConsumer(
+        MongoDbContext context,
         IConfiguration configuration,
         IServiceScopeFactory scopeFactory,
         ILogger<TicketGenerationConsumer> logger)
@@ -27,6 +30,7 @@ public class TicketGenerationConsumer : BackgroundService
         _configuration = configuration;
         _scopeFactory = scopeFactory;
         _logger = logger;
+        _context = context;
     }
 
     public override async Task StartAsync(CancellationToken cancellationToken)
@@ -93,6 +97,13 @@ public class TicketGenerationConsumer : BackgroundService
                 using var scope = _scopeFactory.CreateScope();
                 var ticketPdfService = scope.ServiceProvider.GetRequiredService<ITicketPdfService>();
                 var pdfBytes = await ticketPdfService.GenerateAsync(orderEvent);
+                var ticket = new TicketPdf
+                {
+                    OrderId = orderEvent.OrderId,
+                    Content = pdfBytes,
+                    GeneratedAt = DateTime.UtcNow
+                };
+                await _context.TicketPdfs.InsertOneAsync(ticket);
                 _logger.LogInformation("PDF generated: {Size} bytes for order {OrderId}", pdfBytes.Length, orderEvent.OrderId);
 
                 await _channel!.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);

@@ -10,11 +10,13 @@ public class OrderService : IOrderService
 {
     private readonly MongoDbContext _context;
     private readonly IReservationService _reservationService;
+    private readonly BankingService _bankingService;
 
-    public OrderService(MongoDbContext context, IReservationService reservationService)
+    public OrderService(MongoDbContext context, IReservationService reservationService, BankingService bankingService)
     {
         _context = context;
         _reservationService = reservationService;
+        _bankingService = bankingService;
     }
 
     public async Task<(bool Success, string? Error, Order? Order)> CreateOrderAsync(string userId, List<OrderItemDto> requestedItems)
@@ -108,7 +110,7 @@ public class OrderService : IOrderService
         await _context.Payments.InsertOneAsync(payment);
         
         // a fake banking validation that always returns true
-        var paymentResult = BankingService.Pay(order.TotalAmount, true);
+        var paymentResult = await _bankingService.Pay(order.TotalAmount, true,order.Id);
         
         if (!paymentResult)
         {

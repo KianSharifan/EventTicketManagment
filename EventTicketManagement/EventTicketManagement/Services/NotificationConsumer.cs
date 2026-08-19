@@ -96,10 +96,13 @@ public class NotificationConsumer : BackgroundService
                 var itemsSummary = string.Join(", ",
                     orderEvent.Items.Select(i => $"{i.TicketTypeName} x{i.Quantity}"));
 
+                var downloadUrl = $"http://localhost:5295/api/Ticket/orders/{orderEvent.OrderId}/ticket-pdf";
+                
                 await emailService.SendAsync(
                     orderEvent.Email,
                     "Order confirmed",
-                    $"order with ID:{orderEvent.OrderId}with items:{itemsSummary} wad completed."
+                    $"order with ID:{orderEvent.OrderId}with items:{itemsSummary} wad completed." +
+                    $"download from: {downloadUrl}"
                 );
 
                 await _channel!.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
