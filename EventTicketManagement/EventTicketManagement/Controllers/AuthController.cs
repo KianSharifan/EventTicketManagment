@@ -4,10 +4,12 @@ using EventTicketManagement.Interfaces;
 using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace EventTicketManagement.Controllers;
 
 [ApiController]
+[EnableRateLimiting("AuthPolicy")]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {

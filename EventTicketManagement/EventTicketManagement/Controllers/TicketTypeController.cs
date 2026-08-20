@@ -20,7 +20,8 @@ public class TicketTypeController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllTicketTypes()
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetEventTicketTypes()
     {
         try
         {
