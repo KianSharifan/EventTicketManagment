@@ -52,14 +52,12 @@ flowchart TB
     Client[Client / Swagger / Postman]
 
     subgraph API["ASP.NET Core Web API"]
-        Auth[AuthController]
-        Events[EventsController]
-        Venues[VenuesController]
-        Tickets[TicketsController]
-        Payments[PaymentsController]
+        Auth[Auth]
+        Events[Events]
+        Tickets[Tickets]
+        Payments[Payments]
         Orders[OrderService]
-        Admin[AdminController]
-        Notif[NotificationsController]
+        More[...]
     end
 
     Mongo[(MongoDB)]
@@ -72,8 +70,6 @@ flowchart TB
     Client -->|HTTP + JWT| API
     Auth --> Mongo
     Events --> Mongo
-    Venues --> Mongo
-    Admin --> Mongo
     Tickets --> Redis
     Orders --> Redis
     Orders --> Mongo
@@ -81,8 +77,13 @@ flowchart TB
     Orders -->|publish on confirm| Rabbit
     Rabbit --> NotifConsumer
     Rabbit --> TicketConsumer
-    NotifConsumer -->|email/SMS| External[(Email/SMS Provider)]
+    NotifConsumer -->|email| External[(Email Provider)]
     TicketConsumer -->|writes ticket + QR| Mongo
+
+    classDef controllerNode font-size:11px,padding:2px;
+    classDef moreNode stroke-dasharray: 4 3,fill:none,font-size:11px;
+    class Auth,Events,Tickets,Payments,Orders controllerNode;
+    class More moreNode;
 ```
 
 ---
@@ -137,7 +138,7 @@ sequenceDiagram
     O->>Mq: publish order_confirmed
     Mq-->>NC: order_confirmed
     Mq-->>TC: order_confirmed
-    NC->>NC: send email/SMS
+    NC->>NC: send email
     TC->>TC: generate ticket + QR (UniqueCode only)
     P-->>U: 200 OK
 ```
