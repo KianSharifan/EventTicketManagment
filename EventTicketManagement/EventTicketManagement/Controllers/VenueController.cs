@@ -4,6 +4,7 @@ using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventTicketManagement.Controllers;
 
@@ -67,6 +68,7 @@ public class VenueController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateVenue([FromBody] VenueDto venueDto)
     {
         try
@@ -99,6 +101,7 @@ public class VenueController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateVenue(string id, [FromBody] VenueDto venueDto)
     {
         try
@@ -140,6 +143,7 @@ public class VenueController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteVenue(string id)
     {
         try

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using EventTicketManagement.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventTicketManagement.Controllers;
 
@@ -21,6 +22,7 @@ public class OrderController : Controller
     }
     
      [HttpGet]
+     [Authorize(Roles = "Admin")]
      public async Task<IActionResult> GetAllOrders()
      {
          try
@@ -70,6 +72,7 @@ public class OrderController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Attendee,Organizer")]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto orderDto)
     {
         try
@@ -92,7 +95,19 @@ public class OrderController : Controller
             return StatusCode(500, "An unexpected error occured");
         }
     }
-    
-    //put
-    //delete
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteOrder(string id)
+    {
+        if (!ObjectId.TryParse(id, out _))
+            return BadRequest("Invalid ID format"); 
+        
+        var order = await _orderService.GetByIdAsync(id);
+        if (order == null)
+            return NotFound("No such order");
+        
+        await _context.Orders.DeleteOneAsync(o => o.Id == id);
+        return NoContent();
+    }
 }

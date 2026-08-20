@@ -1,9 +1,9 @@
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
-using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventTicketManagement.Controllers;
 
@@ -19,6 +19,7 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -33,6 +34,7 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(string id)
     {
         try
@@ -53,6 +55,7 @@ public class PaymentController : ControllerBase
     }
     
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdatePayment(string id, [FromBody] PaymentDto paymentDto)
     {
         try
@@ -77,6 +80,7 @@ public class PaymentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePayment(string id)
     {
         try

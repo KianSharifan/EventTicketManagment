@@ -15,6 +15,6 @@ public class User
     [MaxLength(200)]
     public required string FullName { get; set; }
     [MaxLength(200)]
-    public required string Role { get; set; }     // "Organizer" | "Attendee"
+    public required string Role { get; set; }     // "Organizer" | "Attendee" | "Admin"
     public DateTime CreatedAt { get; set; }
 }

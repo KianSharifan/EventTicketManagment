@@ -1,9 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
 using EventTicketManagement.Data;
 using EventTicketManagement.Dtos;
 using EventTicketManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventTicketManagement.Controllers;
 
@@ -66,15 +68,16 @@ public class EventController : Controller
     }
 
     [HttpPost]
-    //should be completed later with the authentication
+    [Authorize(Roles = "Admin,Organizer")]
     public async Task<IActionResult> CreateEvent([FromBody] EventDto eventDto)
     {
         try
         {
             if (!string.IsNullOrWhiteSpace(eventDto.Title) && eventDto.StartDate != null && !string.IsNullOrWhiteSpace(eventDto.VenueId) && !string.IsNullOrWhiteSpace(eventDto.CategoryId))
             {
-                //a way to get the id of the organizer from the jwt token
-                // string organizerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var organizerId= User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+                if (string.IsNullOrEmpty(organizerId))
+                    return Unauthorized();
                 if (!ObjectId.TryParse(eventDto.CategoryId, out _))
                     return BadRequest("Invalid category ID format"); 
                 var c = await _context.EventCategories.Find(c => c.Id == eventDto.CategoryId).FirstOrDefaultAsync();
@@ -94,8 +97,7 @@ public class EventController : Controller
                     EventCategoryId = c.Id,
                     VenueId = v.Id,
                     CreatedAt = DateTime.UtcNow,
-                    OrganizerId = "1"
-                    // OrganizerId = organizerId
+                    OrganizerId = organizerId
                 };
                 
                 await _context.Events.InsertOneAsync(createdEvent);
@@ -110,6 +112,7 @@ public class EventController : Controller
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,Organizer")]
     public async Task<IActionResult> UpdateEvent(string id,[FromBody] EventDto eventDto)
     {
         try
@@ -168,6 +171,7 @@ public class EventController : Controller
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin,Organizer")]
     public async Task<IActionResult> DeleteEvent(string id)
     {
         if (!ObjectId.TryParse(id, out _))
@@ -214,6 +218,7 @@ public class EventController : Controller
     }
 
     [HttpPost("categories")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateEventCategory([FromBody] EventCategoryDto categoryDto)
     {
         try
@@ -241,6 +246,7 @@ public class EventController : Controller
     }
 
     [HttpPut("categories/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateEventCategory(string id, [FromBody] EventCategoryDto categoryDto)
     {
         try
@@ -268,6 +274,7 @@ public class EventController : Controller
     }
 
     [HttpDelete("categories/{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteEventCategory(string id)
     {
         if (!ObjectId.TryParse(id, out _))

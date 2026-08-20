@@ -1,11 +1,10 @@
+using System.IdentityModel.Tokens.Jwt;
 using EventTicketManagement.Data;
-using EventTicketManagement.Dtos;
 using EventTicketManagement.Interfaces;
-using EventTicketManagement.Models;
-using EventTicketManagement.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventTicketManagement.Controllers;
 
@@ -15,13 +14,11 @@ public class TicketController : ControllerBase
 {
     private readonly MongoDbContext _context;
     private readonly IOrderService _orderService;
-    private readonly ITicketPdfService _ticketPdfService;
 
-    public TicketController(MongoDbContext context, IOrderService orderService, ITicketPdfService ticketPdfService)
+    public TicketController(MongoDbContext context, IOrderService orderService)
     {
         _context = context;
         _orderService = orderService;
-        _ticketPdfService = ticketPdfService;
     }
     
     [HttpGet]
@@ -29,8 +26,7 @@ public class TicketController : ControllerBase
     {
         try
         {
-            // return Ok(await _context.TicketTypes.Find(_ => true).ToListAsync());
-            return Ok(await _context.Tickets.Find(_ => true).ToListAsync());
+            return Ok(await _context.TicketTypes.Find(_ => true).ToListAsync());
         }
         catch (Exception)
         {
@@ -59,6 +55,7 @@ public class TicketController : ControllerBase
     }
     
     [HttpPut("{id}/check-in")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CheckIn(string id)
     {
         try
@@ -86,6 +83,7 @@ public class TicketController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteTicket(string id)
     {
         try
@@ -106,14 +104,19 @@ public class TicketController : ControllerBase
     }
     
     [HttpGet("orders/{orderId}/ticket-pdf")]
+    [Authorize(Roles = "Admin,Attendee")]
     public async Task<IActionResult> DownloadTicketPdf(string orderId)
     {
         var order = await _orderService.GetByIdAsync(orderId);
         if (order == null) 
             return NotFound("No such order");
 
-        // چک کن این کاربر واقعاً صاحب این orderه (auth بعداً که اضافه شد)
-
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+        if(userId != _context.Orders.Find(o => o.Id == orderId).First().UserId && _context.Users.Find(u => u.Id == userId).First().Role != "Admin")
+            return Unauthorized();
+        
         var content = await _context.TicketPdfs.Find(t => t.OrderId == orderId).FirstOrDefaultAsync();
 
         return File(content!.Content, "application/pdf", $"ticket-{orderId}.pdf");
