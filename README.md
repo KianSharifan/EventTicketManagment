@@ -27,10 +27,8 @@ The platform allows:
 - Users to **register/login**, browse events, and **reserve tickets**
 - A **Redis-based reservation system** to atomically manage limited ticket inventory and prevent overselling
 - **Payment** processing that confirms an order (1:1 with a single payment)
-- **RabbitMQ**-driven, asynchronous **notifications** (email/SMS) and **ticket generation** (QR code) once an order is confirmed
+- **RabbitMQ**-driven, asynchronous **notifications** (email) and **ticket generation** (QR code) once an order is confirmed
 - A **check-in endpoint** that validates a ticket's QR code at the event entrance
-
-An `Event` is intentionally simple — no sub-schedule, sessions, or speakers. It represents a single event at a single venue.
 
 ---
 
@@ -42,7 +40,7 @@ An `Event` is intentionally simple — no sub-schedule, sessions, or speakers. I
 | Database | MongoDB |
 | Caching / Reservation locking | Redis (Sorted Sets + Lua scripts) |
 | Messaging | RabbitMQ (fanout exchange) |
-| Auth | JWT (simple, no OAuth2) |
+| Auth | JWT |
 | Password hashing | BCrypt.Net-Next |
 
 ---
@@ -174,7 +172,7 @@ flowchart LR
 
 | Controller | Responsibility | Access |
 |---|---|---|
-| `AuthController` | Register / Login | Public |
+| `AuthController` | Register | Login | Public |
 | `UsersController` | User profile management | Authenticated |
 | `EventsController` | Event CRUD | Read: Public · Write: Admin |
 | `VenuesController` | Venue CRUD | Read: Public · Write: Admin |
@@ -182,7 +180,6 @@ flowchart LR
 | `TicketsController` | Reservation, ticket retrieval, check-in | Authenticated |
 | `PaymentsController` | Confirm payment for a reservation | Authenticated |
 | `NotificationsController` | Notification-related endpoints | Authenticated / internal |
-| `AdminController` | Admin dashboard / stats | Admin only |
 
 Only `OrderService` exists as a separate service layer; other controllers talk to MongoDB collections directly (no repository layer).
 
@@ -193,7 +190,6 @@ Only `OrderService` exists as a separate service layer; other controllers talk t
 - **Redis + Lua for reservations** — avoids overselling under concurrent requests without needing distributed locks or database transactions
 - **RabbitMQ fanout exchange** — decouples "an order was confirmed" from "what happens next" (notifications, ticket generation can scale/fail independently)
 - **QR encodes only a UniqueCode** — keeps tickets lightweight and avoids exposing personal data in a scannable code
-- **No Speaker/Session model** — Events are intentionally single, flat entities; no internal sub-schedule
 - **1:1 Payment–Order relationship** — one payment per order, keeping the payment model simple
 - **JWT over OAuth2** — reduces complexity for a learning-focused project where the goal is understanding auth mechanics, not integrating a third-party identity provider
 
