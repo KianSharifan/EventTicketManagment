@@ -2,8 +2,6 @@
 
 A backend platform for managing events, ticket reservations, payments, and check-in — built with **ASP.NET Core Web API**, **MongoDB**, **Redis**, and **RabbitMQ**.
 
-This is the first implementation of the project (a second version in Python/FastAPI is planned later). The .NET stack was chosen first for faster iteration on the MongoDB/Redis/RabbitMQ-heavy parts.
-
 ---
 
 ## Table of Contents
