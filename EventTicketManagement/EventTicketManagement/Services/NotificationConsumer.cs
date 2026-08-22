@@ -33,7 +33,7 @@ public class NotificationConsumer : BackgroundService
     {
         var factory = new ConnectionFactory
         {
-            HostName = _configuration["RabbitMQ:Host"] ?? "localhost",
+            HostName = _configuration["RabbitMQ:Host"] ?? "rabbitmq",
             UserName = _configuration["RabbitMQ:Username"] ?? "guest",
             Password = _configuration["RabbitMQ:Password"] ?? "guest"
         };

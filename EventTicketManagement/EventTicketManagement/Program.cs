@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
 
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
@@ -41,8 +40,9 @@ builder.Services.AddAuthorization();
 
 
 builder.Services.AddSingleton<MongoDbContext>();
+var redisConnectionString = builder.Configuration["Redis:ConnectionString"];
 builder.Services.AddSingleton<IConnectionMultiplexer>(
-    ConnectionMultiplexer.Connect("localhost:6379")
+    ConnectionMultiplexer.Connect(redisConnectionString!)
 );
 builder.Services.AddRateLimiter(options =>
 {
